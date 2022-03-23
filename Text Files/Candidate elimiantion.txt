@@ -1,0 +1,96 @@
+Algo:
+
+Initialize G to the set of maximally general hypotheses in H.
+Initialize S to the set of maximally specific hypotheses in H.
+For each training example d
+If d is a positive example
+Remove from G any hypothesis that does not include.
+For each hypothesis s in S that does not include d, remove s from S.
+Add to S all minimal generalizations h of s such that h includes d, and
+Some member of G is more general than h
+Remove from S any hypothesis that is more general than another hypothesis in S.
+For each training example d
+If d is a negative example
+Remove from S any hypothesis that does not include.
+For each hypothesis g in G that does not include d
+Remove g from G
+Add to G all minimal generalizations h of g such that
+h does not include d and
+Some member of S is more specific than h
+Remove from G any hypothesis that is less general than another hypothesis in G.
+If G or S, ever becomes empty, data not consistent (with H).
+
+
+Code:
+
+
+import csv
+a = []
+print("The datasset is:")
+with open('ws.csv','r') as csvFile:
+    reader = csv.reader(csvFile)
+    for row in reader:
+        a.append(row)
+        print(row)
+
+
+temp = []
+num = len(a[0])-1
+S = ['o'] * num
+G = ['?'] * num
+
+print('The initail specific hypothesis is : {}'.format(S))
+print('The initail generic hypothesis is : {}'.format(G))
+
+for j in range(num):
+    S[j] = a[0][j]
+
+
+for i in range(len(a)):
+    if a[i][num] == 'Yes':
+        for j in range(num):
+            if a[i][j] != S[j]:
+                S[j] = '?'
+
+        for j in range(num):
+            for k in range(len(temp)):
+                if temp[k][j] != S[j] and temp[k][j] != '?':
+                    del temp[k]
+
+        print('Specific hypothesis S{0} is'.format(i+1), S)
+
+        if len(temp) == 0:
+            print('General hypothesis G{0} is'.format(i+1), G)
+
+        else:
+            print('General Hypothesis G{0} is'.format(i+1), temp)
+
+    if a[i][num] == 'No':
+        for j in range(num):
+            if S[j] != a[i][j] and S[j] != '?':
+                G[j] = S[j]
+                temp.append(G)
+                G = ['?'] * num
+
+        print('Specific hypothesis S{0} is'.format(i+1), S)
+        print('General Hypothesis G{0} is'.format(i+1), temp)
+
+
+
+op:
+
+The datasset is:
+['Sunny', 'Warm', 'Normal', 'Strong', 'Warm', 'Same', 'Yes']
+['Sunny', 'Warm', 'High', 'Strong', 'Warm', 'Same', 'Yes']
+['Rainy', 'Cold', 'High', 'Strong', 'Warm', 'Change', 'No']
+['Sunny', 'Warm', 'High', 'Strong', 'Cool', 'Change', 'Yes']
+The initail specific hypothesis is : ['o', 'o', 'o', 'o', 'o', 'o']
+The initail generic hypothesis is : ['?', '?', '?', '?', '?', '?']
+Specific hypothesis S1 is ['Sunny', 'Warm', 'Normal', 'Strong', 'Warm', 'Same']
+General hypothesis G1 is ['?', '?', '?', '?', '?', '?']
+Specific hypothesis S2 is ['Sunny', 'Warm', '?', 'Strong', 'Warm', 'Same']
+General hypothesis G2 is ['?', '?', '?', '?', '?', '?']
+Specific hypothesis S3 is ['Sunny', 'Warm', '?', 'Strong', 'Warm', 'Same']
+General Hypothesis G3 is [['Sunny', '?', '?', '?', '?', '?'], ['?', 'Warm', '?', '?', '?', '?'], ['?', '?', '?', '?', '?', 'Same']]
+Specific hypothesis S4 is ['Sunny', 'Warm', '?', 'Strong', '?', '?']
+General Hypothesis G4 is [['Sunny', '?', '?', '?', '?', '?'], ['?', 'Warm', '?', '?', '?', '?']]
